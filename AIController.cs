@@ -55,7 +55,7 @@
             Collider2D? findComponent = findGameObject.GetComponent<Collider2D>();
             if (findComponent != null)
             {
-                if (findComponent.Check(gameObject))
+                if (findComponent.Check(gameObject) && findComponent.isTrigger == false)
                 {
                     // 충돌
                     transform.x = oldX;

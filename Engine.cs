@@ -418,7 +418,11 @@ class Engine
                     newGameObject.transform.y = y;
                     SpriteRenderer renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.Shape = 'P';
-                    renderer.Load("player.bmp");
+                    renderer.colorKey.g = 0;
+                    renderer.Load("test.bmp");
+                    renderer.isMultiple = true;
+                    renderer.spriteCount = 5;
+
                     renderer.renderOrder = RenderOrder.Player;
                     newGameObject.AddComponent<PlayerController>();
                     Collider2D collider2D = newGameObject.AddComponent<Collider2D>();
@@ -513,8 +517,15 @@ class Engine
 
     public void Run()
     {
+        bool isFirst = true;
+        //Awake();
         while (isRunning)
         {
+            if (isFirst)
+            {
+                StartInAllComponents();
+                isFirst = false;
+            }
             ProcessInput();
             Update();
             Render();
@@ -526,6 +537,17 @@ class Engine
                 nextSceneName = string.Empty;
             }
         } //frame
+    }
+
+    private void StartInAllComponents()
+    {
+        foreach(GameObject gameObject in gameObjects)
+        {
+            foreach(Component component in gameObject.components)
+            {
+                component.Start();
+            }
+        }
     }
 
     public void Term()

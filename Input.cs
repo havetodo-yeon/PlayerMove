@@ -48,7 +48,6 @@
     }
 }
 */
-
 using SDL2;
 
 class Input
