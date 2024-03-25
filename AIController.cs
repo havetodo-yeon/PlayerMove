@@ -1,12 +1,23 @@
 ﻿class AIController : Component
 {
+    protected ulong processTime;
+    protected ulong ElapsedTime;
     public AIController()
     {
-
+        processTime = 500;
+        ElapsedTime = 0;
     }
 
     public override void Update()
     {
+        ElapsedTime += Engine.GetInstance().deltaTime;
+        if (ElapsedTime < processTime)
+        {
+            return;
+        }
+
+        ElapsedTime = 0;
+
         Random random = new Random();
 
         int oldX = transform.x;

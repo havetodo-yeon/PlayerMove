@@ -9,7 +9,8 @@
 
     public bool Check(GameObject other)
     {
-        if (other.transform.x == transform.x && other.transform.y == transform.y)
+        if (other.transform.x == transform.x 
+            && other.transform.y == transform.y)
         {
             return true;
         }

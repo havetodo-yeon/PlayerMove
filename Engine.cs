@@ -284,6 +284,7 @@ class Engine
 
 }*/
 
+using SDL2;
 using System.Data;
 
 class Engine
@@ -318,6 +319,13 @@ class Engine
     public bool isNextLoading = false;
     public string nextSceneName = string.Empty;
 
+    public IntPtr myWindow; // 2024-03-25 ADD SDL
+    public IntPtr myRenderer;
+    public SDL.SDL_Event myEvent;
+    ulong lastTime;
+
+    public ulong deltaTime;
+
     public void NextLoadScene(string _nextSceneName)
     {
         isNextLoading = true;
@@ -327,7 +335,21 @@ class Engine
 
     public void Init()
     {
+        if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0)
+        {
+            Console.WriteLine("Init Fail");
+            return;
+        }
+
+        myWindow = SDL.SDL_CreateWindow("2D Engine", 100, 100, 640, 480, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN);
+        myRenderer = SDL.SDL_CreateRenderer(myWindow, -1,
+            SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED |
+            SDL.SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC |
+            SDL.SDL_RendererFlags.SDL_RENDERER_TARGETTEXTURE);
+
         Input.Init();
+
+        lastTime = SDL.SDL_GetTicks64();
     }
 
     public void Stop()
@@ -362,6 +384,7 @@ class Engine
                     newGameObject.transform.y = y;
                     SpriteRenderer renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.Shape = '*';
+                    renderer.Load("wall.bmp");
                     renderer.renderOrder = RenderOrder.Wall;
                     newGameObject.AddComponent<Collider2D>();
 
@@ -371,6 +394,7 @@ class Engine
                     newGameObject.transform.y = y;
                     renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.Shape = ' ';
+                    renderer.Load("floor.bmp");
                     renderer.renderOrder = RenderOrder.Floor;
 
                 }
@@ -382,6 +406,7 @@ class Engine
                     newGameObject.transform.y = y;
                     SpriteRenderer renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.Shape = ' ';
+                    renderer.Load("floor.bmp");
                     renderer.renderOrder = RenderOrder.Floor;
 
                 }
@@ -393,6 +418,7 @@ class Engine
                     newGameObject.transform.y = y;
                     SpriteRenderer renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.Shape = 'P';
+                    renderer.Load("player.bmp");
                     renderer.renderOrder = RenderOrder.Player;
                     newGameObject.AddComponent<PlayerController>();
                     Collider2D collider2D = newGameObject.AddComponent<Collider2D>();
@@ -404,6 +430,7 @@ class Engine
                     newGameObject.transform.y = y;
                     renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.Shape = ' ';
+                    renderer.Load("floor.bmp");
                     renderer.renderOrder = RenderOrder.Floor;
                 }
                 else if (map[y][x] == 'G')
@@ -415,6 +442,7 @@ class Engine
                     SpriteRenderer renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.renderOrder = RenderOrder.Goal;
                     renderer.Shape = 'G';
+                    renderer.Load("goal.bmp");
                     Collider2D collider2D = newGameObject.AddComponent<Collider2D>();
                     collider2D.isTrigger = true;
 
@@ -424,6 +452,7 @@ class Engine
                     newGameObject.transform.y = y;
                     renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.Shape = ' ';
+                    renderer.Load("floor.bmp");
                     renderer.renderOrder = RenderOrder.Floor;
 
                 }
@@ -436,6 +465,7 @@ class Engine
                     SpriteRenderer renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.renderOrder = RenderOrder.Monster;
                     renderer.Shape = 'M';
+                    renderer.Load("monster.bmp");
                     Collider2D collider2D = newGameObject.AddComponent<Collider2D>();
                     collider2D.isTrigger = true;
                     newGameObject.AddComponent<AIController>();
@@ -446,6 +476,7 @@ class Engine
                     newGameObject.transform.y = y;
                     renderer = newGameObject.AddComponent<SpriteRenderer>();
                     renderer.Shape = ' ';
+                    renderer.Load("floor.bmp");
                     renderer.renderOrder = RenderOrder.Floor;
                 }
             }
@@ -500,6 +531,10 @@ class Engine
     public void Term()
     {
         gameObjects.Clear();
+
+        SDL.SDL_DestroyRenderer(myRenderer);
+        SDL.SDL_DestroyWindow(myWindow);
+        SDL.SDL_Quit();
     }
 
     public T Instantiate<T>() where T : GameObject, new()
@@ -519,11 +554,15 @@ class Engine
 
     protected void ProcessInput()
     {
-        Input.keyInfo = Console.ReadKey();
+        SDL.SDL_PollEvent(out myEvent); // 화면 안멈추게 큐에서 꺼내오는 거
+
+        // Input.keyInfo = Console.ReadKey();
     }
 
     protected void Update()
     {
+        deltaTime = SDL.SDL_GetTicks64() - lastTime;
+        //Console.WriteLine(deltaTime);
         foreach (GameObject gameObject in gameObjects)
         {
             foreach (Component component in gameObject.components)
@@ -531,6 +570,7 @@ class Engine
                 component.Update();
             }
         }
+        lastTime = SDL.SDL_GetTicks64();
     }
 
     protected void Render()
@@ -539,7 +579,7 @@ class Engine
         //{
         //    gameObjects[i].Render();
         //}
-        Console.Clear();
+        //Console.Clear();
         foreach (GameObject gameObject in gameObjects)
         {
             Renderer? renderer = gameObject.GetComponent<Renderer>();
@@ -548,6 +588,7 @@ class Engine
                 renderer.Render();
             }
         }
+        SDL.SDL_RenderPresent(Engine.GetInstance().myRenderer);
     }
 
     public GameObject? Find(string name)

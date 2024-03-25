@@ -24,7 +24,7 @@
             Console.WriteLine("Congraturation.");
             Console.ReadKey();
 
-            Engine.GetInstance().NextLoadScene("Level02.map");
+            Engine.GetInstance().NextLoadScene("level02.map");
 
             //Engine.GetInstance().Term();
             //Engine.GetInstance().LoadScene("Level02.map");

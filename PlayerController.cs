@@ -1,32 +1,30 @@
 ﻿
+using SDL2;
+
 class PlayerController : Component
 {
     public override void Update()
     {
-        if (transform == null)
-        {
-            return;
-        }
         int oldX = transform.x;
         int oldY = transform.y;
 
-        if (Input.GetButton("Left"))
+        if (Input.GetKey(SDL.SDL_Keycode.SDLK_a))   // 프레임 단위로 입력받는 작업
         {
             transform.Translate(-1, 0);
         }
-        if (Input.GetButton("Right"))
+        if (Input.GetKey(SDL.SDL_Keycode.SDLK_d))
         {
             transform.Translate(1, 0);
         }
-        if (Input.GetButton("Up"))
+        if (Input.GetKey(SDL.SDL_Keycode.SDLK_w))
         {
             transform.Translate(0, -1);
         }
-        if (Input.GetButton("Down"))
+        if (Input.GetKey(SDL.SDL_Keycode.SDLK_s))
         {
             transform.Translate(0, +1);
         }
-        if (Input.GetButton("Quit"))
+        if (Input.GetKey(SDL.SDL_Keycode.SDLK_ESCAPE))
         {
             //singleton pattern
             Engine.GetInstance().Stop();
@@ -49,7 +47,7 @@ class PlayerController : Component
             Collider2D? findComponent = findGameObject.GetComponent<Collider2D>();
             if (findComponent != null)
             {
-                if (findComponent.Check(gameObject))
+                if (findComponent.Check(gameObject) && findComponent.isTrigger == false)
                 {
                     // 충돌
                     transform.x = oldX;
