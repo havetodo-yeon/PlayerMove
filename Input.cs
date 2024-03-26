@@ -93,9 +93,16 @@ class Input
         return (keyInfo.Key == checkKeycode);
     }
 
-    public static bool GetKey(SDL.SDL_Keycode checkKeycode)
+    public static bool GetKeyDown(SDL.SDL_Keycode checkKeycode)
     {
-        return (Engine.GetInstance().myEvent.key.keysym.sym == checkKeycode);
+        return (Engine.GetInstance().myEvent.key.keysym.sym == checkKeycode && 
+            Engine.GetInstance().myEvent.type == SDL.SDL_EventType.SDL_KEYDOWN);
+    }
+
+    public static bool GetKeyUp(SDL.SDL_Keycode checkKeycode)
+    {
+        return (Engine.GetInstance().myEvent.key.keysym.sym == checkKeycode && 
+            Engine.GetInstance().myEvent.type == SDL.SDL_EventType.SDL_KEYUP);
     }
 
     public static bool GetButton(string buttonName)
@@ -103,4 +110,11 @@ class Input
         return (InputMapping[buttonName].button == keyInfo.Key
             || InputMapping[buttonName].altButton == keyInfo.Key);
     }
+
+    #region 여러 키 동시 입력
+    //int key = 0;
+    //IntPtr keyState = SDL.SDL_GetKeyboardState(out key);
+    //keyState[SDL.SDL_Keycode.SDLK_1] && keyState[SDL.SDL_Keycode.SDLK_2] // 동시 입력 처리
+    #endregion
+
 }
