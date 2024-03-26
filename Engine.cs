@@ -521,8 +521,6 @@ class Engine
         //Awake();
         while (isRunning)
         {
-            int key = 0;
-            IntPtr[] keyState = SDL.SDL_GetKeyboardState(out key);
             if(Engine.GetInstance().myEvent.type == SDL.SDL_EventType.SDL_QUIT)
             {
                 Stop();
